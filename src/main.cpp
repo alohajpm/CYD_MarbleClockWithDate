@@ -1,3 +1,8 @@
+/*
+  CYD Marble Clock
+  Inspired by Ivan Miranda's Marble Clock
+*/
+
 #include <Arduino.h>
 #include <math.h>
 #include "charbitmap.h"
@@ -28,12 +33,77 @@ int charHeightInPixels = charHeight*gridSize;
 int minR = 8;
 int charSpacing = 2*minR + 1;
 
+//-- Paths --
+const int curveMax = 33;
+const int pathMax = curveMax + 5*charWidth + 5*charWidth; // longest curve + 5 chars on the straight channels
+Point2D pathCoords[charHeight][pathMax];
+Point2D curveCoords[charHeight][pathMax];
+int horizOffset = charHeightInPixels+minR; // Left offset of the straight channels
+
+//-- Top Buckets --
+int topBucketHeight = 10;
+int blackBucketWidth = tft.width() *3/4;
+int whiteBucketWidth = tft.width() - blackBucketWidth;
+
 void SetupCYD()
 {
   tft.init();
   tft.setRotation(1); // 1=Landscape USB on right. 2=Portrait USB on top
   tft.fillScreen(clockBackgroundColor);
   tft.setTextColor(clockFontColor, clockBackgroundColor);
+}
+
+void ComputePaths()
+{
+  for (int row=0; row<charHeight; row++) 
+  {
+    int index=0;
+    // Start by filling the top straight path (right to left)
+    for (int x=5*charWidth; x>=0; x--)
+    {
+      int y = tft.height()-1-charHeightInPixels-charSpacing-row*gridSize;
+      pathCoords[row][index++] = {horizOffset + x*gridSize, y};
+    }
+
+    //Followed by the curved coords
+    for (int c=curveMax-1; c>=0; c--)
+    {
+      Point2D p = curveCoords[row][c];
+      if (p.x!=0 || p.y!=0)
+        pathCoords[row][index++] = {p.x,p.y};
+    }
+
+    // Finish by filling the bottom straight path (left to right)
+    for (int x=0; x<(5*charWidth); x++)
+    {
+      int y = tft.height()-1-gridSize-(charHeight-1-row)*gridSize;
+      pathCoords[row][index++] = {horizOffset + x*gridSize, y};
+    }
+  }
+}
+
+void TestPath()
+{
+  for (int i=0; i<pathMax; i++)
+  {
+    for (int row=0; row<charHeight; row++)
+    {
+      Point2D p = pathCoords[row][i];
+      tft.fillRect(p.x, p.y, dotSize, dotSize,TFT_YELLOW);
+      tft.drawPixel(p.x, p.y,TFT_BLUE);
+      tft.drawPixel(p.x+dotSize-1, p.y,TFT_BLUE);
+      tft.drawPixel(p.x,p.y+dotSize-1,TFT_BLUE);
+      tft.drawPixel(p.x+dotSize-1, p.y+dotSize-1,TFT_BLUE);
+    }
+
+    delay(20);
+
+    for (int row=0; row<charHeight; row++)
+    {
+      Point2D p = pathCoords[row][i];
+      tft.fillRect(p.x, p.y, dotSize, dotSize,TFT_BLUE );
+    }
+  }
 }
 
 void TestPattern()
@@ -45,7 +115,7 @@ void DrawChar(int x, int y, char ch) // x,y is bottom left of where char should 
 {
   for (int col=0; col<charWidth; col++)
   {
-    int colX = x + (charWidth-1-col)*(dotSize+1); // Columns are drawn right to left
+    int colX = x + (charWidth-col)*(dotSize+1); // Columns are drawn right to left
     for (int row=0; row<charHeight; row++) 
     {
       int rowY = y - row*gridSize;
@@ -62,50 +132,70 @@ void DrawChar(int x, int y, char ch) // x,y is bottom left of where char should 
 
 void TestChars()
 {
-  int horizOffset = charHeightInPixels+minR+gridSize;
-  for (byte d=0; d<10; d++)
+  for (int d=0; d<10; d++)
   {
     int y = d>=5 ? tft.height()-1-gridSize : tft.height()-1-charHeightInPixels-charSpacing;
     DrawChar(horizOffset + (d %5)*charWidthInPixels,y,'0'+d);
   }
 }
 
-void TestCurve(int r)
+void TestCurve(int row, int r)
 {
   float spacing = dotSize+2.5; // Make the spacing slightly bigger than the marble/dot size to ensure no overlaps
   int n =PI*r/spacing;
-  Point2D origin = {charHeightInPixels+minR,tft.height()-1-charHeightInPixels-minR};
+  Debug("Max # of marbles in the curve",n);
+  Point2D origin = {charHeightInPixels+minR-gridSize,tft.height()-1-charHeightInPixels-minR};
   for (int i=0; i<=n; i++)
   {
     float angle = PI/2 + (PI*i/n);
     Point2D p;
     p.x = origin.x + r*cos(angle);
     p.y = origin.y + r*sin(angle);
+    curveCoords[row][i]=p;
 
     tft.fillRect(p.x, p.y, dotSize, dotSize, TFT_BLUE);
-      tft.drawPixel(p.x, p.y,TFT_BLUE);
-      tft.drawPixel(p.x+dotSize-1, p.y,TFT_BLUE);
-      tft.drawPixel(p.x,p.y+dotSize-1,TFT_BLUE);
-      tft.drawPixel(p.x+dotSize-1, p.y+dotSize-1,TFT_BLUE);
+    tft.drawPixel(p.x, p.y,TFT_BLUE);
+    tft.drawPixel(p.x+dotSize-1, p.y,TFT_BLUE);
+    tft.drawPixel(p.x,p.y+dotSize-1,TFT_BLUE);
+    tft.drawPixel(p.x+dotSize-1, p.y+dotSize-1,TFT_BLUE);
   }
+}
+
+void drawTopBuckets()
+{
+  //TODO 
+}
+
+
+void setupIO()
+{
+  pinMode(0, INPUT_PULLUP);
 }
 
 void setup()
 {
   Serial.begin(115200);
   SetupCYD();
-  TestPattern();
+  //TestPattern();
   TestChars();
 
   int r = minR+1;
   for (int i=0; i<charHeight; i++)
   {
-    TestCurve(r);
+    TestCurve(i, r);
     r = r + gridSize;
   }
+
+  ComputePaths();
+  TestPath();
 }
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
+  while (digitalRead(0)==HIGH)
+    delay(100);
+  
+  TestChars();
+  delay(1000);
+  TestPath();
 }
