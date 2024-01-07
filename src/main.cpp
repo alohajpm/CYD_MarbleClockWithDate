@@ -7,6 +7,7 @@
 #include <math.h>
 #include "charbitmap.h"
 #include "point2D.h"
+#include "node.h"
 
 #define TOUCH_CS // This sketch does not use touch, but this is defined to quiet the warning about not defining touch_cs.
 
@@ -36,7 +37,7 @@ int charSpacing = 2*minR + 1;
 //-- Paths --
 const int curveMax = 33;
 const int pathMax = curveMax + 5*charWidth + 5*charWidth; // longest curve + 5 chars on the straight channels
-Point2D pathCoords[charHeight][pathMax];
+Node paths[charHeight][pathMax];
 Point2D curveCoords[charHeight][pathMax];
 int horizOffset = charHeightInPixels+minR; // Left offset of the straight channels
 
@@ -62,7 +63,7 @@ void ComputePaths()
     for (int x=5*charWidth; x>=0; x--)
     {
       int y = tft.height()-1-charHeightInPixels-charSpacing-row*gridSize;
-      pathCoords[row][index++] = {horizOffset + x*gridSize, y};
+      paths[row][index++].coord = {horizOffset + x*gridSize, y};
     }
 
     //Followed by the curved coords
@@ -70,14 +71,14 @@ void ComputePaths()
     {
       Point2D p = curveCoords[row][c];
       if (p.x!=0 || p.y!=0)
-        pathCoords[row][index++] = {p.x,p.y};
+        paths[row][index++].coord = {p.x,p.y};
     }
 
     // Finish by filling the bottom straight path (left to right)
     for (int x=0; x<(5*charWidth); x++)
     {
       int y = tft.height()-1-gridSize-(charHeight-1-row)*gridSize;
-      pathCoords[row][index++] = {horizOffset + x*gridSize, y};
+      paths[row][index++].coord = {horizOffset + x*gridSize, y};
     }
   }
 }
@@ -88,7 +89,7 @@ void TestPath()
   {
     for (int row=0; row<charHeight; row++)
     {
-      Point2D p = pathCoords[row][i];
+      Point2D p = paths[row][i].coord;
       tft.fillRect(p.x, p.y, dotSize, dotSize,TFT_YELLOW);
       tft.drawPixel(p.x, p.y,TFT_BLUE);
       tft.drawPixel(p.x+dotSize-1, p.y,TFT_BLUE);
@@ -100,7 +101,7 @@ void TestPath()
 
     for (int row=0; row<charHeight; row++)
     {
-      Point2D p = pathCoords[row][i];
+      Point2D p = paths[row][i].coord;
       tft.fillRect(p.x, p.y, dotSize, dotSize,TFT_BLUE );
     }
   }
@@ -165,7 +166,6 @@ void drawTopBuckets()
 {
   //TODO 
 }
-
 
 void setupIO()
 {
