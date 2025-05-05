@@ -37,10 +37,6 @@ void Debug(String msg)
 #include <WiFiUdp.h>
 #include <NTPClient.h>
 
-// Update these with your WiFi network settings:
-const char* ssid = "JN24";
-const char* password = "D3skt0pK1ng";
-
 WiFiUDP ntpUDP;
 // For Pacific Standard Time (UTC-8) use an offset of -28800 seconds.
 NTPClient timeClient(ntpUDP, "pool.ntp.org", -28800, 60000);
@@ -67,9 +63,8 @@ void setup()
   Serial.begin(115200);
 
   // --- Setup and WiFi ---
-  WiFi.begin(ssid, password);
 
-
+  
   HomeAssistant ha("http://192.168.1.10:8123/api/","homeassistant",std::string("password"));
 
   ui.init();
