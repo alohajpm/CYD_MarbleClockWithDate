@@ -17,23 +17,22 @@ HomeAssistant::HomeAssistant(const std::string& url, const std::string& user, co
 
 
 bool HomeAssistant::connect(const std::string& url, const std::string& user, const std::string& password) {
-  Serial.print("Connecting to WiFi");
+   Serial.print("Connecting to WiFi");
 
-  WiFi.begin(ssid, password.c_str());
+   WiFi.begin(ssid, ::password);
     while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
-  }
-  Serial.println("Connected.");
+   }Serial.println("Connected.");
 
     Serial.print("Connecting to Home Assistant at: ");
     Serial.println(this->url.c_str());
     
   // Set up basic authentication
-    HTTPClient http;
-     String authHeader = "Basic "; 
+     HTTPClient http;
+     String authHeader = String("Basic "); 
      String u = String(this->user.c_str()) + ":" + String(this->pass.c_str());
-  authHeader += base64::encode((const uint8_t*)u.c_str(), u.length()); 
+  authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
     http.addHeader("Authorization", authHeader);
 
   // Attempt to connect
@@ -53,13 +52,13 @@ bool HomeAssistant::connect(const std::string& url, const std::string& user, con
   }
 
 }
-
+ 
 std::vector<std::string> HomeAssistant::discoverLights(const std::string& url, const std::string& user, const std::string& password) {
   Serial.println("Discovering lights from Home Assistant...");
   std::vector<std::string> lights;
 
   HTTPClient http;
-  String lightURL = this->url;
+  String lightURL = String(this->url.c_str());
   lightURL += "/api/states"; // Endpoint to get all states
   http.begin(lightURL);
 
@@ -104,29 +103,29 @@ std::vector<std::string> HomeAssistant::discoverLights(const std::string& url, c
 bool HomeAssistant::toggleLight(const std::string& url, const std::string& user, const std::string& password, const std::string& lightId, const std::string& lightState) {
   Serial.print("Toggling light with ID: " );
   Serial.println(lightId.c_str());
-    HTTPClient http;
-    String lightURL = this->url;
-    lightURL += "/api/services/light/toggle"; // Endpoint to toggle light
-    http.begin(lightURL);
+  HTTPClient http;
+  String lightURL = String(this->url.c_str());
+  lightURL += "/api/services/light/toggle"; // Endpoint to toggle light
+  http.begin(lightURL);
 
-    // Set up basic authentication
-     String authHeader = "Basic "; 
-        String u = String(user.c_str()) + ":" + String(password.c_str());
-
-    authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
-    http.addHeader("Authorization", authHeader);
+  // Set up basic authentication
+    String authHeader = String("Basic ");
+    String u = String(user.c_str()) + ":" + String(password.c_str());
+  
+     authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
+      http.addHeader("Authorization", authHeader);
     http.addHeader("Content-Type", "application/json");
 
     // Construct JSON payload for toggling the light
     const char * payload;
     if (lightState == "on") {
-        payload = "{\"entity_id\":\"" + String(lightId).c_str() + "\",\"state\":\"off\"}";
+      payload = ("{\"entity_id\":\"" + String(lightId.c_str()) + "\",\"state\":\"off\"}").c_str(); // Convert std::string to const char*
 
-    } else {
-        payload = "{\"entity_id\":\"" + String(lightId).c_str() + "\",\"state\":\"on\"}";
-
-       }
-      Serial.print("Payload: ");
+      } else {
+          payload = ("{\"entity_id\":\"" + String(lightId.c_str()) + "\",\"state\":\"on\"}").c_str();// Convert std::string to const char*
+      
+        }
+     Serial.print("Payload: ");
         Serial.println(payload);
     // Change to POST
     http.end();
@@ -158,13 +157,13 @@ std::string HomeAssistant::getLightState(const std::string& lightId) {
     Serial.print("Getting state of light with ID: ");
     Serial.println(lightId.c_str());
       HTTPClient http;
-      String stateURL = this->url;
-      stateURL += "/api/states/";
-      stateURL += lightId;
-      http.begin(stateURL);
-
-      // Set up basic authentication
-        String authHeader = "Basic "; 
+      String stateURL = String(this->url.c_str());
+      stateURL += "/api/states/"; 
+      stateURL += String(lightId.c_str());
+       http.begin(stateURL.c_str());
+      
+       // Set up basic authentication
+        String authHeader = String("Basic ");
         String u = String(user.c_str()) + ":" + String(password.c_str());
         authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
     
@@ -174,13 +173,13 @@ std::string HomeAssistant::getLightState(const std::string& lightId) {
       int httpResponseCode = http.GET();
 
       if (httpResponseCode == 200) {
-        Serial.println("Successfully retrieved light state.");
-        String payload = http.getString();
-        Serial.println("Payload: "+ payload);
+         Serial.println("Successfully retrieved light state.");
+         String payload = http.getString();
+         Serial.println("Payload: "+ payload);
         
         JsonDocument doc;
         deserializeJson(doc, payload);
-        std::string state = String(doc["state"].as<String>()).c_str();
+        std::string state = doc["state"].as<String>().c_str();
                http.end();
         return state;   
       } else {
@@ -196,13 +195,13 @@ float HomeAssistant::getTemperature(const std::string& url, const std::string& u
   Serial.println(entityId.c_str());
 
   HTTPClient http;
-    String tempURL = this->url;
-    tempURL += "/api/states/";
-  tempURL += entityId;
-  http.begin(tempURL);
-
+   String tempURL = String(this->url.c_str()); 
+   tempURL += "/api/states/";
+   tempURL += entityId.c_str();
+   http.begin(tempURL.c_str());
+  
   // Set up basic authentication
- String authHeader = "Basic "; 
+  String authHeader = String("Basic "); 
    String u = String(user.c_str()) + ":" + String(password.c_str());
   authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
   http.addHeader("Authorization", authHeader);

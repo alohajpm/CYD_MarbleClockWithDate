@@ -60,22 +60,22 @@ void UI::drawSettingsScreen() {
 }
 
 // Use tft.touched() instead of tft.getTouch()
-void UI::handleTouch() {
+void UI::handleTouch()
+{
   HomeAssistant homeAssistant("http://192.168.1.10:8123/api/", "homeassistant", "yourpassword");
   uint16_t x, y;
-  if(tft.touched()){
-    // Check if the touch is within the lightbulb area
-    if (x > tft.width() / 2 - 60 && x < tft.width() / 2 + 60 &&
-        y > tft.height() / 2 - 20 && y < tft.height() / 2 + 20) {
-      // Toggle the light
-      std::vector<std::string> lights = homeAssistant.discoverLights("http://192.168.1.10:8123/api/", "homeassistant", "password");
-      if (lights.size() > 0) {
-        homeAssistant.toggleLight("http://192.168.1.10:8123/api/", "homeassistant", "password",lights[0],"on");
-      }
-    } else if (x > tft.width() - 60 && x < tft.width() &&
-        y > tft.height() - 20 && y < tft.height()) {
-      drawSettingsScreen();
+  // Check if the touch is within the lightbulb area
+  if (x > tft.width() / 2 - 60 && x < tft.width() / 2 + 60 &&
+      y > tft.height() / 2 - 20 && y < tft.height() / 2 + 20)
+  {
+    // Toggle the light
+    std::vector<std::string> lights = homeAssistant.discoverLights("http://192.168.1.10:8123/api/", "homeassistant", "password");
+    if (lights.size() > 0) {
+      homeAssistant.toggleLight("http://192.168.1.10:8123/api/", "homeassistant", "password", lights[0], "on");
     }
-  }
+  } else if (x > tft.width() - 60 && x < tft.width() &&
+             y > tft.height() - 20 && y < tft.height()) {
+    drawSettingsScreen();
+    }
 }
 

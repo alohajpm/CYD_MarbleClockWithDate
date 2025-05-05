@@ -18,7 +18,7 @@ public:
 private:
     std::string url;
     std::string user;
-    std::string password;
+    std::string pass;
 
 
     // Private members for Home Assistant connection and data

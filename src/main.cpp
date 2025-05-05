@@ -70,7 +70,7 @@ void setup()
   WiFi.begin(ssid, password);
 
 
-  HomeAssistant ha;
+  HomeAssistant ha("http://192.168.1.10:8123/api/","homeassistant","password");
 
   ui.init();
   
