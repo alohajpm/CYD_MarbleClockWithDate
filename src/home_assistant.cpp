@@ -32,8 +32,8 @@ bool HomeAssistant::connect(const std::string& url, const std::string& user, con
   // Set up basic authentication
     HTTPClient http;
      String authHeader = "Basic "; 
-     String u = String(user.c_str()) + ":" + String(password.c_str());
-  authHeader += base64::encode(u.c_str(), u.length());
+     String u = String(this->user.c_str()) + ":" + String(this->pass.c_str());
+  authHeader += base64::encode((const uint8_t*)u.c_str(), u.length()); 
     http.addHeader("Authorization", authHeader);
 
   // Attempt to connect
@@ -66,8 +66,7 @@ std::vector<std::string> HomeAssistant::discoverLights(const std::string& url, c
   // Set up basic authentication
     String authHeader = "Basic "; 
     String u = String(user.c_str()) + ":" + String(password.c_str());
-
-  authHeader += base64::encode(u.c_str(), u.length());
+  authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
   http.addHeader("Authorization", authHeader);
   http.addHeader("Content-Type", "application/json");
 
@@ -114,20 +113,19 @@ bool HomeAssistant::toggleLight(const std::string& url, const std::string& user,
      String authHeader = "Basic "; 
         String u = String(user.c_str()) + ":" + String(password.c_str());
 
-
-    authHeader += base64::encode(u.c_str(), u.length());
+    authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
     http.addHeader("Authorization", authHeader);
     http.addHeader("Content-Type", "application/json");
 
     // Construct JSON payload for toggling the light
-    String payload;
+    const char * payload;
     if (lightState == "on") {
-        payload = "{\"entity_id\":\"" + lightId + "\",\"state\":\"off\"}";
+        payload = "{\"entity_id\":\"" + String(lightId).c_str() + "\",\"state\":\"off\"}";
 
     } else {
-        payload = "{\"entity_id\":\"" + lightId + "\",\"state\":\"on\"}";
+        payload = "{\"entity_id\":\"" + String(lightId).c_str() + "\",\"state\":\"on\"}";
 
-    }
+       }
       Serial.print("Payload: ");
         Serial.println(payload);
     // Change to POST
@@ -168,8 +166,8 @@ std::string HomeAssistant::getLightState(const std::string& lightId) {
       // Set up basic authentication
         String authHeader = "Basic "; 
         String u = String(user.c_str()) + ":" + String(password.c_str());
-        authHeader += base64::encode(u.c_str(), u.length());
-      
+        authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
+    
       http.addHeader("Authorization", authHeader);
       http.addHeader("Content-Type", "application/json");
 
@@ -182,7 +180,7 @@ std::string HomeAssistant::getLightState(const std::string& lightId) {
         
         JsonDocument doc;
         deserializeJson(doc, payload);
-        std::string state = std::string(doc["state"].as<String>().c_str());
+        std::string state = String(doc["state"].as<String>()).c_str();
                http.end();
         return state;   
       } else {
@@ -206,7 +204,7 @@ float HomeAssistant::getTemperature(const std::string& url, const std::string& u
   // Set up basic authentication
  String authHeader = "Basic "; 
    String u = String(user.c_str()) + ":" + String(password.c_str());
-  authHeader += base64::encode(u.c_str(), u.length());
+  authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
   http.addHeader("Authorization", authHeader);
   http.addHeader("Content-Type", "application/json");
 
