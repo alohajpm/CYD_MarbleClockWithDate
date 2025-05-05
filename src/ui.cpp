@@ -6,6 +6,9 @@
 // Initialize the TFT_eSPI library
 TFT_eSPI tft = TFT_eSPI();
 
+//Constructor for UI class
+UI::UI(){}
+
 // Implementation of the UI::init() function
 void UI::init()
 {

@@ -6,9 +6,10 @@
 class UI {
 public:
   void init();
-  UI();
   void drawMainScreen(String time, String date, String temp, bool lightState);
   void drawSettingsScreen();
+   UI();
+
   void handleTouch(int x, int y);
   void drawLightBulb(bool on);
 
