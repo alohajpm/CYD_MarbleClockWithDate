@@ -87,6 +87,5 @@ void loop()
   
   // --- Main Loop ---
   ui.drawMainScreen("12:00", "Jan 1, 2024", "70F", true);
-  ui.handleTouch(0,0);
+  ui.handleTouch();
 }
-

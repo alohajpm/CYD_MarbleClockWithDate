@@ -4,6 +4,8 @@
 #include <string>
 #include "home_assistant.h"
 
+// Includes for WiFi and HTTPClient
+#include <WiFi.h>
 
 // Initialize the TFT_eSPI library
 TFT_eSPI tft = TFT_eSPI();
@@ -57,13 +59,15 @@ void UI::drawSettingsScreen() {
   tft.print("Settings Screen");
 }
 
-void UI::handleTouch(int x, int y, HomeAssistant& homeAssistant) {
+void UI::handleTouch() {
+    int x, y;
+    HomeAssistant homeAssistant;
+    
   if(tft.getTouch(&x, &y)){
-    int x;
-    int y;
+    
     // Check if the touch is within the lightbulb area
-    if (x > tft.width() / 2 - 30 && x < tft.width() / 2 + 30 &&
-        y > tft.height() / 2 - 10 && y < tft.height() / 2 + 10) {
+    if (x > tft.width() / 2 - 60 && x < tft.width() / 2 + 60 &&
+        y > tft.height() / 2 - 20 && y < tft.height() / 2 + 20) {
           
       // Toggle the light
       std::vector<std::string> lights = homeAssistant.discoverLights();
@@ -72,7 +76,8 @@ void UI::handleTouch(int x, int y, HomeAssistant& homeAssistant) {
       }
     }
     // Check if the touch is within the settings area
-    else if (x > tft.width() - 60 && x < tft.width() && y > tft.height() - 20 && y < tft.height()) {
+    else if (x > tft.width() - 60 && x < tft.width() && 
+        y > tft.height() - 20 && y < tft.height()) {
       drawSettingsScreen();
     }
   }

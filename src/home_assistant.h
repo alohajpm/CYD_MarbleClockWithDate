@@ -7,9 +7,9 @@
 
 class HomeAssistant {
 public:
-  bool connect(const std::string& url, const std::string& user, const std::string& password) ;
-  std::vector<std::string> discoverLights();
-  bool toggleLight(const std::string& lightId);
+  bool connect(const std::string& url, const std::string& user, const std::string& password);
+  std::vector<std::string> discoverLights(const std::string& url, const std::string& user, const std::string& password);
+  bool toggleLight(const std::string& url, const std::string& user, const std::string& password, const std::string& lightId, const std::string& lightState);
   std::string getLightState(const std::string& lightId);
   float getTemperature(const std::string& zipCode);
 

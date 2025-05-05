@@ -9,25 +9,25 @@ const char* ssid = "JN24"; // Replace with your Wi-Fi SSID
 const char* password = "D3skt0pK1ng"; // Replace with your Wi-Fi password
 
 
-bool HomeAssistant::connect(const std::string& url, const std::string& user, const std::string& password) {
+bool HomeAssistant::connect() {
   Serial.print("Connecting to WiFi");
+
   WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
+    while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
   Serial.println("Connected.");
 
-  Serial.print("Connecting to Home Assistant at: ");
-  Serial.println(url.c_str());
-
-  HTTPClient http;
-  http.begin(url.c_str());
-
+    Serial.print("Connecting to Home Assistant at: ");
+    Serial.println(this->url.c_str());
+    
   // Set up basic authentication
+    HTTPClient http;
   String authHeader = "Basic ";
-  authHeader += base64::encode(user + ":" + password);
-  http.addHeader("Authorization", authHeader);
+     String u = String(this->user.c_str()) + ":" + String(this->pass.c_str());
+  authHeader += base64::encode(u);
+    http.addHeader("Authorization", authHeader);
 
   // Attempt to connect
   int httpResponseCode = http.GET();
@@ -47,18 +47,18 @@ bool HomeAssistant::connect(const std::string& url, const std::string& user, con
 
 }
 
-std::vector<std::string> HomeAssistant::discoverLights(const std::string& url, const std::string& user, const std::string& password) {
+std::vector<std::string> HomeAssistant::discoverLights(){
   Serial.println("Discovering lights from Home Assistant...");
   std::vector<std::string> lights;
 
   HTTPClient http;
-  String lightURL = url;
+  String lightURL = this->url;
   lightURL += "/api/states"; // Endpoint to get all states
   http.begin(lightURL);
 
   // Set up basic authentication
-  String authHeader = "Basic ";
-  authHeader += base64::encode(user + ":" + password);
+    String authHeader = "Basic ";
+  authHeader += base64::encode((const uint8_t*)((user + ":" + password).c_str()), (user + ":" + password).length());
   http.addHeader("Authorization", authHeader);
   http.addHeader("Content-Type", "application/json");
 
@@ -93,17 +93,17 @@ std::vector<std::string> HomeAssistant::discoverLights(const std::string& url, c
   return lights;
 }
 
-bool HomeAssistant::toggleLight(const std::string& url, const std::string& user, const std::string& password, const std::string& lightId, const std::string& lightState) {
+bool HomeAssistant::toggleLight(const std::string& lightId){
   Serial.print("Toggling light with ID: " );
   Serial.println(lightId.c_str());
     HTTPClient http;
-    String lightURL = url;
+    String lightURL = this->url;
     lightURL += "/api/services/light/toggle"; // Endpoint to toggle light
     http.begin(lightURL);
 
     // Set up basic authentication
     String authHeader = "Basic ";
-    authHeader += base64::encode(user + ":" + password);
+    authHeader += base64::encode((const uint8_t*)((user + ":" + password).c_str()), (user + ":" + password).length());
     http.addHeader("Authorization", authHeader);
     http.addHeader("Content-Type", "application/json");
 
@@ -145,21 +145,16 @@ bool HomeAssistant::toggleLight(const std::string& url, const std::string& user,
 }
 
 std::string HomeAssistant::getLightState(const std::string& lightId) {
-    Serial.println("Getting state of light with ID: " + lightId.c_str());
-    return "";
-}
-
-std::string HomeAssistant::getLightState(const std::string& url, const std::string& user, const std::string& password, const std::string& lightId) {
     Serial.print("Getting state of light with ID: ");
     Serial.println(lightId.c_str());
       HTTPClient http;
-      String stateURL = url;
-    stateURL += "/api/states/";
+      String stateURL = this->url;
+      stateURL += "/api/states/";
       stateURL += lightId;
       http.begin(stateURL);
 
       // Set up basic authentication
-      String authHeader = "Basic ";
+    String authHeader = "Basic ";
       authHeader += base64::encode(user + ":" + password);
       http.addHeader("Authorization", authHeader);
       http.addHeader("Content-Type", "application/json");
@@ -184,18 +179,18 @@ std::string HomeAssistant::getLightState(const std::string& url, const std::stri
       }
 }
 
-float HomeAssistant::getTemperature(const std::string& url, const std::string& user, const std::string& password, const std::string& entityId) {
+float HomeAssistant::getTemperature(const std::string& entityId) {
   Serial.print("Getting temperature for entity: ");
   Serial.println(entityId.c_str());
 
   HTTPClient http;
-  String tempURL = url;
-  tempURL += "/api/states/";
+    String tempURL = this->url;
+    tempURL += "/api/states/";
   tempURL += entityId;
   http.begin(tempURL);
 
   // Set up basic authentication
-  String authHeader = "Basic ";
+ String authHeader = "Basic ";
   authHeader += base64::encode(user + ":" + password);
   http.addHeader("Authorization", authHeader);
   http.addHeader("Content-Type", "application/json");
@@ -210,7 +205,7 @@ float HomeAssistant::getTemperature(const std::string& url, const std::string& u
       DynamicJsonDocument doc(1024);
       deserializeJson(doc, payload);
       float temp = doc["state"].as<float>();
-    
+
     http.end();
     return temp;
   } else {
