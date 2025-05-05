@@ -10,7 +10,8 @@ const char* password = "D3skt0pK1ng"; // Replace with your Wi-Fi password
 
 
 HomeAssistant::HomeAssistant(const std::string& url, const std::string& user, const std::string& password) :
-  url(url), user(user), password(password){}
+  url(url), user(user), password(password){
+  }
 
 
 
@@ -164,7 +165,7 @@ std::string HomeAssistant::getLightState(const std::string& lightId) {
       
        // Set up basic authentication
         String authHeader = String("Basic ");
-      String u = String(user.c_str()) + ":" + String(password.c_str());
+      String u = String(this->user.c_str()) + ":" + String(this->password.c_str());
     authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
     
       http.addHeader("Authorization", authHeader);

@@ -76,3 +76,4 @@ void UI::handleTouch()
                y > tft.height() - 20 && y < tft.height()) {
     drawSettingsScreen();
   }
+}
