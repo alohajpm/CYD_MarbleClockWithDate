@@ -5,6 +5,7 @@
 
 class UI {
 public:
+  void init();
   UI();
   void drawMainScreen(String time, String date, String temp, bool lightState);
   void drawSettingsScreen();
