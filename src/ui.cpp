@@ -57,8 +57,10 @@ void UI::drawSettingsScreen() {
   tft.print("Settings Screen");
 }
 
-void UI::handleTouch(HomeAssistant& homeAssistant) {
-  if (tft.getTouch(&x, &y)) {
+void UI::handleTouch(int x, int y, HomeAssistant& homeAssistant) {
+  if(tft.getTouch(&x, &y)){
+    int x;
+    int y;
     // Check if the touch is within the lightbulb area
     if (x > tft.width() / 2 - 30 && x < tft.width() / 2 + 30 &&
         y > tft.height() / 2 - 10 && y < tft.height() / 2 + 10) {

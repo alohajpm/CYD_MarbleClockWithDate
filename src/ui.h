@@ -10,7 +10,7 @@ public:
   void drawSettingsScreen();
    UI();
 
-  void handleTouch(int x, int y);
+  void handleTouch();
   void drawLightBulb(bool on);
 
 private:
