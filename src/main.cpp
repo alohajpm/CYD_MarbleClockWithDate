@@ -11,6 +11,7 @@
 #include "home_assistant.h"
 #include <WiFi.h>
 #include "ui.h"
+UI ui;
 
 
 #define TOUCH_CS // Defined to quiet warnings about touch
@@ -72,7 +73,6 @@ void setup()
   HomeAssistant ha;
 
   ui.init();
-  timeClient.begin();
   
   // --- Setup and Home Assistant ---
 
@@ -86,7 +86,6 @@ void loop()
 {
   
   //--- Main Loop ---
-  UI ui;
-  ui.drawMainScreen();
+  ui.drawMainScreen("12:00", "Jan 1, 2024", "70F", true);
 }
 

@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "ui.h"
 #include "TFT_eSPI.h"
-#include <TimeLib.h>
+#include <string>
 
 // Initialize the TFT_eSPI library
 TFT_eSPI tft = TFT_eSPI();
@@ -14,26 +14,21 @@ void UI::init()
   tft.fillScreen(TFT_BLACK);
 }
 
-void UI::drawMainScreen()
+void UI::drawMainScreen(String time, String date, String temp, bool lightState)
 {
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.setTextSize(2);
 
-  // Draw the time in the top left
-  time_t now = time(nullptr);
-  char timeString[6];
-  sprintf(timeString, "%02d:%02d", hour(now), minute(now));
-  tft.drawString(timeString, 0, 0);
+  tft.drawString(time, 0, 0);
 
-  // Draw the date below the time
-  char dateString[11];
-  sprintf(dateString, "%04d-%02d-%02d", year(now), month(now), day(now));
-  tft.drawString(dateString, 0, 20);
+  tft.drawString(date, 0, 20);
+
+    tft.drawString(temp, 0, 40);
 
   // Draw the lightbulb in the middle
   // Placeholder code, replace with actual lightbulb drawing
-  tft.drawString("Lightbulb", tft.width() / 2 - 30, tft.height() / 2 - 10);
+  tft.drawString(lightState ? "On" : "Off", tft.width() / 2 - 30, tft.height() / 2 - 10);
 
   // Draw settings in the bottom right
   tft.setTextSize(1);
