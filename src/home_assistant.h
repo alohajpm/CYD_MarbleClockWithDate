@@ -10,19 +10,18 @@ public:
   HomeAssistant(const std::string& url, const std::string& user, const std::string& password);
 
   bool connect(const std::string& url, const std::string& user, const std::string& password);
-  std::vector<std::string> discoverLights(const std::string& url, const std::string& user, const std::string& password);
-  bool toggleLight(const std::string& url, const std::string& user, const std::string& password, const std::string& lightId, const std::string& lightState);
+  std::vector<std::string> discoverLights(const std::string& url, const std::string& user, const std::string& password_str);
+  bool toggleLight(const std::string& url, const std::string& user, const std::string& password_str, const std::string& lightId, const std::string& lightState);
   std::string getLightState(const std::string& lightId);
-  float getTemperature(const std::string& url, const std::string& user, const std::string& password, const std::string& entityId);
+  float getTemperature(const std::string& url, const std::string& user, const std::string& password_str, const std::string& entityId);
 
 private:
     std::string url;
     std::string user;
-    std::string pass;
+    std::string password;
 
 
-    // Private members for Home Assistant connection and data
-    // ...
+
 };
 
 #endif

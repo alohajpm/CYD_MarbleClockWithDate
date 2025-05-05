@@ -70,7 +70,7 @@ void setup()
   WiFi.begin(ssid, password);
 
 
-  HomeAssistant ha("http://192.168.1.10:8123/api/","homeassistant","password");
+  HomeAssistant ha("http://192.168.1.10:8123/api/","homeassistant",std::string("password"));
 
   ui.init();
   

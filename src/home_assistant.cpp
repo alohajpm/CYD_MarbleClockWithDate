@@ -10,17 +10,17 @@ const char* password = "D3skt0pK1ng"; // Replace with your Wi-Fi password
 
 
 HomeAssistant::HomeAssistant(const std::string& url, const std::string& user, const std::string& password) :
-  url(url), user(user), pass(password) {}
+  url(url), user(user), password(password){}
 
 
 
 
 
-bool HomeAssistant::connect(const std::string& url, const std::string& user, const std::string& password) {
+bool HomeAssistant::connect(const std::string& url, const std::string& user, const std::string& password) { 
    Serial.print("Connecting to WiFi");
 
    WiFi.begin(ssid, ::password);
-    while (WiFi.status() != WL_CONNECTED) {
+    while (WiFi.status() != WL_CONNECTED) { 
     delay(500);
     Serial.print(".");
    }Serial.println("Connected.");
@@ -30,8 +30,8 @@ bool HomeAssistant::connect(const std::string& url, const std::string& user, con
     
   // Set up basic authentication
      HTTPClient http;
-     String authHeader = String("Basic "); 
-     String u = String(this->user.c_str()) + ":" + String(this->pass.c_str());
+   String authHeader = "Basic ";
+     String u = String(user.c_str()) + ":" + String(password.c_str());
   authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
     http.addHeader("Authorization", authHeader);
 
@@ -58,7 +58,7 @@ std::vector<std::string> HomeAssistant::discoverLights(const std::string& url, c
   std::vector<std::string> lights;
 
   HTTPClient http;
-  String lightURL = String(this->url.c_str());
+  String lightURL = String(this->url.c_str()); 
   lightURL += "/api/states"; // Endpoint to get all states
   http.begin(lightURL);
 
@@ -105,7 +105,7 @@ bool HomeAssistant::toggleLight(const std::string& url, const std::string& user,
   Serial.println(lightId.c_str());
   HTTPClient http;
   String lightURL = String(this->url.c_str());
-  lightURL += "/api/services/light/toggle"; // Endpoint to toggle light
+ lightURL += "/api/services/light/toggle"; // Endpoint to toggle light
   http.begin(lightURL);
 
   // Set up basic authentication
@@ -119,10 +119,10 @@ bool HomeAssistant::toggleLight(const std::string& url, const std::string& user,
     // Construct JSON payload for toggling the light
     const char * payload;
     if (lightState == "on") {
-      payload = ("{\"entity_id\":\"" + String(lightId.c_str()) + "\",\"state\":\"off\"}").c_str(); // Convert std::string to const char*
+      payload = ("{\"entity_id\":\"" + String(lightId.c_str()) + "\",\"state\":\"off\"}").c_str();
 
       } else {
-          payload = ("{\"entity_id\":\"" + String(lightId.c_str()) + "\",\"state\":\"on\"}").c_str();// Convert std::string to const char*
+          payload = ("{\"entity_id\":\"" + String(lightId.c_str()) + "\",\"state\":\"on\"}").c_str();
       
         }
      Serial.print("Payload: ");
@@ -158,14 +158,14 @@ std::string HomeAssistant::getLightState(const std::string& lightId) {
     Serial.println(lightId.c_str());
       HTTPClient http;
       String stateURL = String(this->url.c_str());
-      stateURL += "/api/states/"; 
-      stateURL += String(lightId.c_str());
+      stateURL += "/api/states/";
+      stateURL += lightId.c_str();
        http.begin(stateURL.c_str());
       
        // Set up basic authentication
         String authHeader = String("Basic ");
-        String u = String(user.c_str()) + ":" + String(password.c_str());
-        authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
+      String u = String(user.c_str()) + ":" + String(password.c_str());
+    authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
     
       http.addHeader("Authorization", authHeader);
       http.addHeader("Content-Type", "application/json");
@@ -197,12 +197,12 @@ float HomeAssistant::getTemperature(const std::string& url, const std::string& u
   HTTPClient http;
    String tempURL = String(this->url.c_str()); 
    tempURL += "/api/states/";
-   tempURL += entityId.c_str();
-   http.begin(tempURL.c_str());
+    tempURL += entityId.c_str();
+    http.begin(tempURL.c_str());
   
   // Set up basic authentication
   String authHeader = String("Basic "); 
-   String u = String(user.c_str()) + ":" + String(password.c_str());
+  String u = String(user.c_str()) + ":" + String(password.c_str());
   authHeader += base64::encode((const uint8_t*)u.c_str(), u.length());
   http.addHeader("Authorization", authHeader);
   http.addHeader("Content-Type", "application/json");
