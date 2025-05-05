@@ -59,24 +59,24 @@ void UI::drawSettingsScreen() {
   tft.print("Settings Screen");
 }
 
+// Use tft.touched() instead of tft.getTouch()
 void UI::handleTouch() {
-    int x, y;
-    HomeAssistant homeAssistant;
-    
-  if(tft.getTouch(&x, &y)){
-    
+    uint16_t x, y;
+  if(tft.touched()){
+     tft.getTouch(&x, &y);
+      HomeAssistant homeAssistant("http://192.168.1.10:8123/api/", "homeassistant", "password");
     // Check if the touch is within the lightbulb area
     if (x > tft.width() / 2 - 60 && x < tft.width() / 2 + 60 &&
         y > tft.height() / 2 - 20 && y < tft.height() / 2 + 20) {
           
+      
       // Toggle the light
-      std::vector<std::string> lights = homeAssistant.discoverLights();
+      std::vector<std::string> lights = homeAssistant.discoverLights("http://192.168.1.10:8123/api/", "homeassistant", "password");
       if (lights.size() > 0) {
-        homeAssistant.toggleLight(lights[0]);
+        homeAssistant.toggleLight("http://192.168.1.10:8123/api/", "homeassistant", "password",lights[0],"on");
       }
     }
-    // Check if the touch is within the settings area
-    else if (x > tft.width() - 60 && x < tft.width() && 
+    else if (x > tft.width() - 60 && x < tft.width() &&
         y > tft.height() - 20 && y < tft.height()) {
       drawSettingsScreen();
     }

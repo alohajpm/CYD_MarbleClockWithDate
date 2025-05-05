@@ -14,6 +14,11 @@ public:
   float getTemperature(const std::string& zipCode);
 
 private:
+    std::string url;
+    std::string user;
+    std::string password;
+
+
     // Private members for Home Assistant connection and data
     // ...
 };
